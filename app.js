@@ -8,11 +8,13 @@ var mongoose = require('mongoose');
 
 var index = require('./routes/index');
 var users = require('./routes/users');
+var seedData = require('./config/seedData');
 
 var app = express();
 
 // mongodb setup
 mongoose.connect('mongodb://localhost:27017/todo-nodejs');
+seedData(app);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
