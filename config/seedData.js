@@ -1,6 +1,6 @@
 var Todos = require('../models/todoModel');
 
-function setupSeedData(req, res) {
+function setupSeedData(req, res, next) {
   var seedTodos = [{
       username: 'test',
       todo: 'Buy milk',
@@ -21,7 +21,10 @@ function setupSeedData(req, res) {
     }
   ];
 
-  Todos.create(seedTodos, function (err, result) {
+  Todos.create(seedTodos, function (error, result) {
+    if (error) {
+      next(error);
+    }
     res.send(result);
   });
 }
@@ -29,26 +32,20 @@ function setupSeedData(req, res) {
 function renderExistingSeedData(req, res, next) {
   Todos.find({}, function (error, results) {
     if (error) {
-      forwardError(error, next);
+      next(error);
     } else {
       res.send(results);
     }
   });
 }
 
-function forwardError(error, next) {
-  error.status = error.status | '500';
-  next(error);
-}
-
 module.exports = function (app) {
-
   app.get('/config/seedData', function (req, res, next) {
     Todos.count({}, function (error, count) {
       if (error) {
-        forwardError(error, next);
+        next(error);
       } else if (count == 0) {
-        setupSeedData(req, res);
+        setupSeedData(req, res, next);
       } else {
         renderExistingSeedData(req, res, next);
       }
